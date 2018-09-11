@@ -18,7 +18,7 @@ class RingerReceiver : BroadcastReceiver() {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val action = intent.getBooleanExtra(EXTRA_MUTE, false)
 
-        Toast.makeText(context, "AlarmReceiver.onReceive: $action", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "Phone Muted: $action", Toast.LENGTH_LONG).show()
 
         if (action)
             audioManager.ringerMode = AudioManager.RINGER_MODE_SILENT
