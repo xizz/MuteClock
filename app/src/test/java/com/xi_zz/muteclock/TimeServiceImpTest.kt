@@ -16,7 +16,7 @@ import java.time.LocalTime
 
 @Config(sdk = [Build.VERSION_CODES.O])
 @RunWith(RobolectricTestRunner::class)
-class TimeServiceTest {
+class TimeServiceImpTest {
 
     private val application = RuntimeEnvironment.application
     private lateinit var timerService: TimeService
