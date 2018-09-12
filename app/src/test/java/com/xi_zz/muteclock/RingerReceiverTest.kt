@@ -21,7 +21,7 @@ class RingerReceiverTest {
     private lateinit var audioManager: AudioManager
 
     @Before
-    fun setup() {
+    fun setUp() {
         ringerReceiver = RingerReceiver()
         audioManager = application.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     }

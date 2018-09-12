@@ -23,7 +23,7 @@ class TimeServiceTest {
     private lateinit var shadowAlarmManager: ShadowAlarmManager
 
     @Before
-    fun setup() {
+    fun setUp() {
         timerService = TimeServiceImp(application)
         shadowAlarmManager = shadowOf(application.getSystemService(Context.ALARM_SERVICE) as AlarmManager)
 
