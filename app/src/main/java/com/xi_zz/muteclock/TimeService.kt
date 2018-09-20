@@ -5,17 +5,17 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
-import android.widget.Toast
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.Subject
 import java.time.LocalTime
 import javax.inject.Inject
 
 
 interface TimeService {
     fun observeStartTime(): Observable<LocalTime>
-    fun setStartTime(time: LocalTime)
     fun observeEndTime(): Observable<LocalTime>
+    fun setStartTime(time: LocalTime)
     fun setEndTime(time: LocalTime)
 
     companion object {
@@ -39,43 +39,32 @@ class TimeServiceImp @Inject constructor(ctx: Context) : TimeService {
         if (endNano != NULL_TIME)
             endTimeSubject.onNext(LocalTime.ofNanoOfDay(endNano))
     }
+
     override fun observeStartTime(): Observable<LocalTime> = startTimeSubject
 
     override fun observeEndTime(): Observable<LocalTime> = endTimeSubject
 
     override fun setStartTime(time: LocalTime) {
-        // Save to Disk
-        appContext.getSharedPreferences(PREF_TIME, Context.MODE_PRIVATE)
-                .edit().putLong(KEY_START_TIME, time.toNanoOfDay()).apply()
-
-        // Notify UI
-        startTimeSubject.onNext(time)
-
-        // Set the Alarm
-        val pendingIntent = Intent(appContext, RingerReceiver::class.java).let {
-            it.putExtra(EXTRA_MUTE, true)
-            PendingIntent.getBroadcast(appContext, TimeService.MUTE, it, PendingIntent.FLAG_UPDATE_CURRENT)
-        }
-
-        alarmManager.setRepeating(AlarmManager.RTC, time.calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
-        Toast.makeText(appContext, "Mute phone at: $time", Toast.LENGTH_SHORT).show()
+        setTime(KEY_START_TIME, time, startTimeSubject, true, TimeService.MUTE)
     }
 
     override fun setEndTime(time: LocalTime) {
+        setTime(KEY_END_TIME, time, endTimeSubject, false, TimeService.UNMUTE)
+    }
+
+    private fun setTime(key: String, time: LocalTime, subject: Subject<LocalTime>, mute: Boolean, requestCode: Int) {
         // Save to Disk
-        appContext.getSharedPreferences(PREF_TIME, Context.MODE_PRIVATE)
-                .edit().putLong(KEY_END_TIME, time.toNanoOfDay()).apply()
+        preferences.edit().putLong(key, time.toNanoOfDay()).apply()
 
         // Notify UI
-        endTimeSubject.onNext(time)
+        subject.onNext(time)
 
         // Set the Alarm
         val pendingIntent = Intent(appContext, RingerReceiver::class.java).let {
-            it.putExtra(EXTRA_MUTE, false)
-            PendingIntent.getBroadcast(appContext, TimeService.UNMUTE, it, PendingIntent.FLAG_UPDATE_CURRENT)
+            it.putExtra(EXTRA_MUTE, mute)
+            PendingIntent.getBroadcast(appContext, requestCode, it, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
         alarmManager.setRepeating(AlarmManager.RTC, time.calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
-        Toast.makeText(appContext, "Unmute phone at: $time", Toast.LENGTH_SHORT).show()
     }
 }
