@@ -2,6 +2,7 @@ package com.xi_zz.muteclock
 
 import android.app.AlarmManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import org.junit.Assert
 import org.junit.Before
@@ -18,15 +19,16 @@ import java.time.LocalTime
 @RunWith(RobolectricTestRunner::class)
 class TimeServiceImpTest {
 
-    private val application = RuntimeEnvironment.application
     private lateinit var timerService: TimeService
-    private lateinit var shadowAlarmManager: ShadowAlarmManager
+
+    private val application = RuntimeEnvironment.application
+    private var preferences: SharedPreferences = application.getSharedPreferences(PREF_TIME, Context.MODE_PRIVATE)
+    private var shadowAlarmManager: ShadowAlarmManager = shadowOf(application.getSystemService(Context.ALARM_SERVICE) as AlarmManager)
+
 
     @Before
     fun setUp() {
         timerService = TimeServiceImp(application)
-        shadowAlarmManager = shadowOf(application.getSystemService(Context.ALARM_SERVICE) as AlarmManager)
-
     }
 
     @Test
@@ -35,6 +37,7 @@ class TimeServiceImpTest {
         timerService.setStartTime(startTime)
 
         Assert.assertEquals(startTime, shadowAlarmManager.nextScheduledAlarm.triggerAtTime.calendar.localTime)
+        Assert.assertEquals(startTime.toNanoOfDay(), preferences.getLong(KEY_START_TIME, 0))
         timerService.observeStartTime().test()
                 .assertNoErrors()
                 .assertValue(startTime)
@@ -46,8 +49,30 @@ class TimeServiceImpTest {
         timerService.setEndTime(endTime)
 
         Assert.assertEquals(endTime, shadowAlarmManager.nextScheduledAlarm.triggerAtTime.calendar.localTime)
+        Assert.assertEquals(endTime.toNanoOfDay(), preferences.getLong(KEY_END_TIME, 0))
         timerService.observeEndTime().test()
                 .assertNoErrors()
                 .assertValue(endTime)
     }
+
+    @Test
+    fun testNoObservableEventIfTimeNotSaved() {
+        timerService = TimeServiceImp(application)
+
+        timerService.observeStartTime().test().assertEmpty()
+        timerService.observeEndTime().test().assertEmpty()
+    }
+
+    @Test
+    fun testHasObservableEventIfTimeSaved() {
+        val startNano = 5000L
+        val endNano = 15000L
+        preferences.edit().putLong(KEY_START_TIME, startNano).commit()
+        preferences.edit().putLong(KEY_END_TIME, endNano).commit()
+        timerService = TimeServiceImp(application)
+
+        timerService.observeStartTime().test().assertValue(LocalTime.ofNanoOfDay(startNano))
+        timerService.observeEndTime().test().assertValue(LocalTime.ofNanoOfDay(endNano))
+    }
+
 }

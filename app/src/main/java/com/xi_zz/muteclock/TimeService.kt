@@ -26,18 +26,32 @@ interface TimeService {
 
 class TimeServiceImp @Inject constructor(ctx: Context) : TimeService {
     private val appContext = ctx.applicationContext
+    private val preferences = appContext.getSharedPreferences(PREF_TIME, Context.MODE_PRIVATE)
     private val alarmManager = appContext.getSystemService(ALARM_SERVICE) as AlarmManager
     private var startTimeSubject: BehaviorSubject<LocalTime> = BehaviorSubject.create<LocalTime>()
     private var endTimeSubject: BehaviorSubject<LocalTime> = BehaviorSubject.create<LocalTime>()
 
+    init {
+        val startNano = preferences.getLong(KEY_START_TIME, NULL_TIME)
+        val endNano = preferences.getLong(KEY_END_TIME, NULL_TIME)
+        if (startNano != NULL_TIME)
+            startTimeSubject.onNext(LocalTime.ofNanoOfDay(startNano))
+        if (endNano != NULL_TIME)
+            endTimeSubject.onNext(LocalTime.ofNanoOfDay(endNano))
+    }
     override fun observeStartTime(): Observable<LocalTime> = startTimeSubject
 
     override fun observeEndTime(): Observable<LocalTime> = endTimeSubject
 
     override fun setStartTime(time: LocalTime) {
+        // Save to Disk
+        appContext.getSharedPreferences(PREF_TIME, Context.MODE_PRIVATE)
+                .edit().putLong(KEY_START_TIME, time.toNanoOfDay()).apply()
+
+        // Notify UI
         startTimeSubject.onNext(time)
 
-        // Set the alarm
+        // Set the Alarm
         val pendingIntent = Intent(appContext, RingerReceiver::class.java).let {
             it.putExtra(EXTRA_MUTE, true)
             PendingIntent.getBroadcast(appContext, TimeService.MUTE, it, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -48,9 +62,14 @@ class TimeServiceImp @Inject constructor(ctx: Context) : TimeService {
     }
 
     override fun setEndTime(time: LocalTime) {
+        // Save to Disk
+        appContext.getSharedPreferences(PREF_TIME, Context.MODE_PRIVATE)
+                .edit().putLong(KEY_END_TIME, time.toNanoOfDay()).apply()
+
+        // Notify UI
         endTimeSubject.onNext(time)
 
-        // Set the alarm
+        // Set the Alarm
         val pendingIntent = Intent(appContext, RingerReceiver::class.java).let {
             it.putExtra(EXTRA_MUTE, false)
             PendingIntent.getBroadcast(appContext, TimeService.UNMUTE, it, PendingIntent.FLAG_UPDATE_CURRENT)
