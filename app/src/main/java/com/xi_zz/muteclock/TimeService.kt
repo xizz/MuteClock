@@ -49,14 +49,14 @@ class TimeServiceImp @Inject constructor(ctx: Context) : TimeService {
         if (time != null)
             setTime(KEY_START_TIME, time, startTimeSubject, true, TimeService.MUTE)
         else
-            cancelTime(KEY_START_TIME, true, TimeService.MUTE)
+            cancelTime(KEY_START_TIME, startTimeSubject, true, TimeService.MUTE)
     }
 
     override fun setEndTime(time: LocalTime?) {
         if (time != null)
-        setTime(KEY_END_TIME, time, endTimeSubject, false, TimeService.UNMUTE)
+            setTime(KEY_END_TIME, time, endTimeSubject, false, TimeService.UNMUTE)
         else
-            cancelTime(KEY_END_TIME, false, TimeService.UNMUTE)
+            cancelTime(KEY_END_TIME, endTimeSubject, false, TimeService.UNMUTE)
     }
 
     private fun setTime(key: String, time: LocalTime, subject: Subject<Optional<LocalTime>>, mute: Boolean, requestCode: Int) {
@@ -75,9 +75,12 @@ class TimeServiceImp @Inject constructor(ctx: Context) : TimeService {
         alarmManager.setRepeating(AlarmManager.RTC, time.calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
     }
 
-    private fun cancelTime(key: String, mute: Boolean, requestCode: Int) {
+    private fun cancelTime(key: String, subject: Subject<Optional<LocalTime>>, mute: Boolean, requestCode: Int) {
         // Remove from Disk
         preferences.edit().remove(key).apply()
+
+        // Notify UI
+        subject.onNext(Optional.empty())
 
         // Remove from Alarm
         val pendingIntent = Intent(appContext, RingerReceiver::class.java).let {

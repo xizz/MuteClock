@@ -83,6 +83,7 @@ class TimeServiceImpTest {
 
         Assert.assertEquals(NULL_TIME, preferences.getLong(KEY_START_TIME, NULL_TIME))
         Assert.assertEquals(null, shadowAlarmManager.nextScheduledAlarm)
+        timerService.observeStartTime().test().assertValue(Optional.empty())
     }
 
     @Test
@@ -92,6 +93,7 @@ class TimeServiceImpTest {
 
         Assert.assertEquals(NULL_TIME, preferences.getLong(KEY_END_TIME, NULL_TIME))
         Assert.assertEquals(null, shadowAlarmManager.nextScheduledAlarm)
+        timerService.observeEndTime().test().assertValue(Optional.empty())
     }
 
 }
