@@ -17,6 +17,8 @@ interface TimeService {
     fun observeEndTime(): Observable<LocalTime>
     fun setStartTime(time: LocalTime)
     fun setEndTime(time: LocalTime)
+    fun cancelStartTime()
+    fun cancelEndTime()
 
     companion object {
         const val MUTE = 11
@@ -66,5 +68,25 @@ class TimeServiceImp @Inject constructor(ctx: Context) : TimeService {
         }
 
         alarmManager.setRepeating(AlarmManager.RTC, time.calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
+    }
+
+    override fun cancelStartTime() {
+        cancelTime(KEY_START_TIME, true, TimeService.MUTE)
+    }
+
+    override fun cancelEndTime() {
+        cancelTime(KEY_END_TIME, false, TimeService.UNMUTE)
+    }
+
+    private fun cancelTime(key: String, mute: Boolean, requestCode: Int) {
+        // Remove from Disk
+        preferences.edit().remove(key).apply()
+
+        // Remove from Alarm
+        val pendingIntent = Intent(appContext, RingerReceiver::class.java).let {
+            it.putExtra(EXTRA_MUTE, mute)
+            PendingIntent.getBroadcast(appContext, requestCode, it, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+        alarmManager.cancel(pendingIntent)
     }
 }
