@@ -15,10 +15,8 @@ import javax.inject.Inject
 interface TimeService {
     fun observeStartTime(): Observable<LocalTime>
     fun observeEndTime(): Observable<LocalTime>
-    fun setStartTime(time: LocalTime)
-    fun setEndTime(time: LocalTime)
-    fun cancelStartTime()
-    fun cancelEndTime()
+    fun setStartTime(time: LocalTime?)
+    fun setEndTime(time: LocalTime?)
 
     companion object {
         const val MUTE = 11
@@ -46,12 +44,18 @@ class TimeServiceImp @Inject constructor(ctx: Context) : TimeService {
 
     override fun observeEndTime(): Observable<LocalTime> = endTimeSubject
 
-    override fun setStartTime(time: LocalTime) {
-        setTime(KEY_START_TIME, time, startTimeSubject, true, TimeService.MUTE)
+    override fun setStartTime(time: LocalTime?) {
+        if (time != null)
+            setTime(KEY_START_TIME, time, startTimeSubject, true, TimeService.MUTE)
+        else
+            cancelTime(KEY_START_TIME, true, TimeService.MUTE)
     }
 
-    override fun setEndTime(time: LocalTime) {
+    override fun setEndTime(time: LocalTime?) {
+        if (time != null)
         setTime(KEY_END_TIME, time, endTimeSubject, false, TimeService.UNMUTE)
+        else
+            cancelTime(KEY_END_TIME, false, TimeService.UNMUTE)
     }
 
     private fun setTime(key: String, time: LocalTime, subject: Subject<LocalTime>, mute: Boolean, requestCode: Int) {
@@ -68,14 +72,6 @@ class TimeServiceImp @Inject constructor(ctx: Context) : TimeService {
         }
 
         alarmManager.setRepeating(AlarmManager.RTC, time.calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
-    }
-
-    override fun cancelStartTime() {
-        cancelTime(KEY_START_TIME, true, TimeService.MUTE)
-    }
-
-    override fun cancelEndTime() {
-        cancelTime(KEY_END_TIME, false, TimeService.UNMUTE)
     }
 
     private fun cancelTime(key: String, mute: Boolean, requestCode: Int) {

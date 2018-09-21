@@ -78,7 +78,7 @@ class TimeServiceImpTest {
     @Test
     fun testCancelStartTime() {
         preferences.edit().putLong(KEY_START_TIME, 5000).commit()
-        timerService.cancelStartTime()
+        timerService.setStartTime(null)
 
         Assert.assertEquals(NULL_TIME, preferences.getLong(KEY_START_TIME, NULL_TIME))
         Assert.assertEquals(null, shadowAlarmManager.nextScheduledAlarm)
@@ -87,7 +87,7 @@ class TimeServiceImpTest {
     @Test
     fun testCancelEndTime() {
         preferences.edit().putLong(KEY_END_TIME, 5000).commit()
-        timerService.cancelEndTime()
+        timerService.setEndTime(null)
 
         Assert.assertEquals(NULL_TIME, preferences.getLong(KEY_END_TIME, NULL_TIME))
         Assert.assertEquals(null, shadowAlarmManager.nextScheduledAlarm)
