@@ -8,13 +8,14 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalTime
+import java.util.Optional
 
 class MainViewModelTest {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var timeService: TimeService
-    private lateinit var startTimeSubject: BehaviorSubject<LocalTime>
-    private lateinit var endTimeSubject: BehaviorSubject<LocalTime>
+    private lateinit var startTimeSubject: BehaviorSubject<Optional<LocalTime>>
+    private lateinit var endTimeSubject: BehaviorSubject<Optional<LocalTime>>
 
     @Before
     fun setUp() {
@@ -22,20 +23,20 @@ class MainViewModelTest {
 
         val slot = slot<LocalTime>()
 
-        startTimeSubject = BehaviorSubject.create<LocalTime>()
+        startTimeSubject = BehaviorSubject.create<Optional<LocalTime>>()
         every {
             timeService.observeStartTime()
         } returns startTimeSubject
         every { timeService.setStartTime(capture(slot)) } answers {
-            startTimeSubject.onNext(slot.captured)
+            startTimeSubject.onNext(Optional.of(slot.captured))
         }
 
-        endTimeSubject = BehaviorSubject.create<LocalTime>()
+        endTimeSubject = BehaviorSubject.create<Optional<LocalTime>>()
         every {
             timeService.observeEndTime()
         } returns endTimeSubject
         every { timeService.setEndTime(capture(slot)) } answers {
-            endTimeSubject.onNext(slot.captured)
+            endTimeSubject.onNext(Optional.of(slot.captured))
         }
 
         mainViewModel = MainViewModel(timeService)

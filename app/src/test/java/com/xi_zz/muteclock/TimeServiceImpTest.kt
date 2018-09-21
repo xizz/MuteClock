@@ -14,6 +14,7 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowAlarmManager
 import java.time.LocalTime
+import java.util.Optional
 
 @Config(sdk = [Build.VERSION_CODES.O])
 @RunWith(RobolectricTestRunner::class)
@@ -40,7 +41,7 @@ class TimeServiceImpTest {
         Assert.assertEquals(startTime.toNanoOfDay(), preferences.getLong(KEY_START_TIME, 0))
         timerService.observeStartTime().test()
                 .assertNoErrors()
-                .assertValue(startTime)
+                .assertValue(Optional.of(startTime))
     }
 
     @Test
@@ -52,7 +53,7 @@ class TimeServiceImpTest {
         Assert.assertEquals(endTime.toNanoOfDay(), preferences.getLong(KEY_END_TIME, 0))
         timerService.observeEndTime().test()
                 .assertNoErrors()
-                .assertValue(endTime)
+                .assertValue(Optional.of(endTime))
     }
 
     @Test
@@ -71,8 +72,8 @@ class TimeServiceImpTest {
         preferences.edit().putLong(KEY_END_TIME, endNano).commit()
         timerService = TimeServiceImp(application)
 
-        timerService.observeStartTime().test().assertValue(LocalTime.ofNanoOfDay(startNano))
-        timerService.observeEndTime().test().assertValue(LocalTime.ofNanoOfDay(endNano))
+        timerService.observeStartTime().test().assertValue(Optional.of(LocalTime.ofNanoOfDay(startNano)))
+        timerService.observeEndTime().test().assertValue(Optional.of(LocalTime.ofNanoOfDay(endNano)))
     }
 
     @Test
