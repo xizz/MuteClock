@@ -10,8 +10,6 @@ val LocalTime.calendar: Calendar
         set(Calendar.MINUTE, minute)
     }
 
-val Long.calendar: Calendar
-    get() = Calendar.getInstance().apply { timeInMillis = this@calendar }
+val Long.calendar: Calendar get() = Calendar.getInstance().apply { timeInMillis = this@calendar }
 
-val Calendar.localTime: LocalTime
-    get() = LocalTime.of(get(Calendar.HOUR_OF_DAY), get(Calendar.MINUTE))
+val Calendar.localTime: LocalTime get() = LocalTime.of(get(Calendar.HOUR_OF_DAY), get(Calendar.MINUTE))
