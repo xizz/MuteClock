@@ -1,4 +1,4 @@
-package com.xi_zz.muteclock
+package com.xi_zz.muteclock.Util
 
 import io.reactivex.Observable
 import java.util.Optional
