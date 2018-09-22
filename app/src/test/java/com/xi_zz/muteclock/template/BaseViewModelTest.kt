@@ -17,17 +17,24 @@ class BaseViewModelTest {
 
     private lateinit var testViewModel: TestViewModel
 
+    private val initState = State(0)
     @Before
     fun setUp() {
-        testViewModel = TestViewModel(State(0))
+        testViewModel = TestViewModel(initState)
     }
 
     @Test
     fun testMutateState() {
-        val newState = State(5)
-        testViewModel.mutateState(newState)
-        testViewModel.state.test()
-                .assertValue(newState)
+        val state1 = State(5)
+        val state2 = State(10)
+
+        val test = testViewModel.state.test()
+
+        testViewModel.mutateState(state1)
+        testViewModel.mutateState(state2)
+
+        test.assertValueCount(3)
+        test.assertValues(initState, state1, state2)
     }
 
     @Test

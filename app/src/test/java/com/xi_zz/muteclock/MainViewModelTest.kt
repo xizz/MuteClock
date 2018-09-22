@@ -3,7 +3,7 @@ package com.xi_zz.muteclock
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
-import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -14,8 +14,8 @@ class MainViewModelTest {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var timeService: TimeService
-    private lateinit var startTimeSubject: BehaviorSubject<Optional<LocalTime>>
-    private lateinit var endTimeSubject: BehaviorSubject<Optional<LocalTime>>
+    private lateinit var startTimeSubject: PublishSubject<Optional<LocalTime>>
+    private lateinit var endTimeSubject: PublishSubject<Optional<LocalTime>>
 
     @Before
     fun setUp() {
@@ -23,7 +23,7 @@ class MainViewModelTest {
 
         val slot = slot<LocalTime>()
 
-        startTimeSubject = BehaviorSubject.create<Optional<LocalTime>>()
+        startTimeSubject = PublishSubject.create<Optional<LocalTime>>()
         every {
             timeService.observeStartTime()
         } returns startTimeSubject
@@ -31,7 +31,7 @@ class MainViewModelTest {
             startTimeSubject.onNext(Optional.of(slot.captured))
         }
 
-        endTimeSubject = BehaviorSubject.create<Optional<LocalTime>>()
+        endTimeSubject = PublishSubject.create<Optional<LocalTime>>()
         every {
             timeService.observeEndTime()
         } returns endTimeSubject
@@ -56,4 +56,33 @@ class MainViewModelTest {
         Assert.assertEquals(time, mainViewModel.endTime)
     }
 
+    @Test
+    fun testReceiveStartTime() {
+        val time1 = LocalTime.of(10, 45)
+        val time2 = LocalTime.of(11, 45)
+
+
+        val testObserver = mainViewModel.state.unwrapMap { it.startTime }.test()
+
+        startTimeSubject.onNext(Optional.of(time1))
+        startTimeSubject.onNext(Optional.empty())
+        startTimeSubject.onNext(Optional.of(time2))
+
+        testObserver.assertValues(time1, time2)
+    }
+
+    @Test
+    fun testReceiveEndTime() {
+        val time1 = LocalTime.of(10, 45)
+        val time2 = LocalTime.of(11, 45)
+
+
+        val testObserver = mainViewModel.state.unwrapMap { it.endTime }.test()
+
+        endTimeSubject.onNext(Optional.of(time1))
+        endTimeSubject.onNext(Optional.empty())
+        endTimeSubject.onNext(Optional.of(time2))
+
+        testObserver.assertValues(time1, time2)
+    }
 }
