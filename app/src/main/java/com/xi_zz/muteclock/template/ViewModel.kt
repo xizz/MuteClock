@@ -1,4 +1,4 @@
-package com.xi_zz.devicesilencer.ui.template
+package com.xi_zz.muteclock.template
 
 import android.os.Bundle
 import android.os.Parcelable
@@ -10,7 +10,7 @@ interface ViewModel<T : Parcelable> {
     val state: Observable<T>
     fun saveState(state: Bundle)
     fun loadState(state: Bundle)
-    fun mutateState(newState: T)
+    fun mutateState(newState: T?)
     fun clearDisposable()
 }
 
@@ -30,7 +30,8 @@ abstract class BaseViewModel<T : Parcelable>(initState: T) : ViewModel<T> {
         mutateState(state.getParcelable(javaClass.name))
     }
 
-    override fun mutateState(newState: T) {
+    override fun mutateState(newState: T?) {
+        if (newState == null) return
         currentState = newState
         subject.onNext(currentState)
     }

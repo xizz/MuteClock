@@ -1,4 +1,4 @@
-package com.xi_zz.devicesilencer.ui.template
+package com.xi_zz.muteclock.template
 
 import android.os.Bundle
 import io.reactivex.disposables.CompositeDisposable

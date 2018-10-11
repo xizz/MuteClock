@@ -1,8 +1,8 @@
 package com.xi_zz.muteclock
 
 import android.os.Parcelable
-import com.xi_zz.devicesilencer.ui.template.BaseViewModel
 import com.xi_zz.muteclock.Util.value
+import com.xi_zz.muteclock.template.BaseViewModel
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.parcel.Parcelize
 import java.time.LocalTime

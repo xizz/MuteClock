@@ -2,7 +2,6 @@ package com.xi_zz.muteclock.template
 
 import android.os.Bundle
 import android.os.Parcelable
-import com.xi_zz.devicesilencer.ui.template.BaseViewModel
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
