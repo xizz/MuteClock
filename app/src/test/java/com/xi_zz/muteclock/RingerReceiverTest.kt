@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.os.Build
+import com.xi_zz.muteclock.Util.EXTRA_MUTE
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test

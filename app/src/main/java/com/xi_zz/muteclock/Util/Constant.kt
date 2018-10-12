@@ -1,4 +1,4 @@
-package com.xi_zz.muteclock
+package com.xi_zz.muteclock.Util
 
 const val EXTRA_MUTE = "EXTRA_MUTE"
 

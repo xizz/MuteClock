@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.widget.Toast
+import com.xi_zz.muteclock.Util.EXTRA_MUTE
 
 // adb shell am broadcast -n com.xi_zz.muteclock/.RingerReceiver --es extra_test "adb_testing"
 // adb shell am broadcast -n com.xi_zz.muteclock/.RingerReceiver --ez EXTRA_MUTE true
