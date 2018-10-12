@@ -1,6 +1,7 @@
-package com.xi_zz.muteclock
+package com.xi_zz.muteclock.ui
 
 import android.os.Parcelable
+import com.xi_zz.muteclock.TimeService
 import com.xi_zz.muteclock.Util.value
 import com.xi_zz.muteclock.template.BaseViewModel
 import io.reactivex.rxkotlin.addTo

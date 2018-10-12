@@ -1,7 +1,8 @@
-package com.xi_zz.muteclock
+package com.xi_zz.muteclock.ui
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import com.xi_zz.muteclock.R
 
 class MainActivity : AppCompatActivity() {
 
