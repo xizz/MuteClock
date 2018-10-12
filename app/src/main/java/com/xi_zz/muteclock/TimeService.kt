@@ -1,6 +1,7 @@
 package com.xi_zz.muteclock
 
 import android.app.AlarmManager
+import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
@@ -31,8 +32,8 @@ interface TimeService {
     }
 }
 
-class TimeServiceImp @Inject constructor(ctx: Context) : TimeService {
-    private val appContext = ctx.applicationContext
+class TimeServiceImp @Inject constructor(application: Application) : TimeService {
+    private val appContext = application.applicationContext
     private val preferences = appContext.getSharedPreferences(PREF_TIME, Context.MODE_PRIVATE)
     private val alarmManager = appContext.getSystemService(ALARM_SERVICE) as AlarmManager
     private var startTimeSubject = BehaviorSubject.create<Optional<LocalTime>>()
