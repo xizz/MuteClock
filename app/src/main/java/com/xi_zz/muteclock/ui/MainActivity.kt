@@ -16,9 +16,7 @@ class MainActivity : AppCompatActivity() {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(view)
-        view.viewModel = viewModel
-        view.setupView()
-        // TODO: refactor to one line
+        view.bindViewModel(viewModel)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

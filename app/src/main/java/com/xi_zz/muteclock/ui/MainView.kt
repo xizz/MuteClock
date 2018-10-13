@@ -7,8 +7,8 @@ import android.widget.FrameLayout
 import android.widget.TimePicker
 import com.xi_zz.muteclock.R
 import com.xi_zz.muteclock.Util.subscribeFromUI
-import com.xi_zz.muteclock.template.BaseModelView
 import com.xi_zz.muteclock.template.ModelView
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.main.view.cancelEndTime
 import kotlinx.android.synthetic.main.main.view.cancelStartTime
@@ -20,31 +20,34 @@ import java.time.LocalTime
 
 class MainView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr), ModelView by BaseModelView() {
+) : FrameLayout(context, attrs, defStyleAttr), ModelView<State, MainViewModel> {
 
     init {
         inflate(context, R.layout.main, this)
         setPadding(16, 16, 16, 16)
     }
 
-    lateinit var viewModel: MainViewModel
+    private val compositeDisposable = CompositeDisposable()
+    private lateinit var model: MainViewModel
 
     private val startTimePickerDialog by lazy {
         val onTimeSetListener: (view: TimePicker, hour: Int, minute: Int) -> Unit = { view, hour, minute ->
-            viewModel.startTime = LocalTime.of(hour, minute)
+            model.startTime = LocalTime.of(hour, minute)
         }
         TimePickerDialog(context, onTimeSetListener, 0, 0, false)
     }
 
     private val endTimePickerDialog by lazy {
         val onTimeSetListener: (view: TimePicker, hour: Int, minute: Int) -> Unit = { view, hour, minute ->
-            viewModel.endTime = LocalTime.of(hour, minute)
+            model.endTime = LocalTime.of(hour, minute)
         }
         TimePickerDialog(context, onTimeSetListener, 0, 0, false)
     }
 
-    fun setupView() {
-        viewModel.state.subscribeFromUI {
+    override fun bindViewModel(viewModel: MainViewModel) {
+        model = viewModel
+
+        model.state.subscribeFromUI {
             startTimeText.text = it.startTime?.toString() ?: context.getString(R.string.no_start_time)
             endTimeText.text = it.endTime?.toString() ?: context.getString(R.string.no_end_time)
         }.addTo(compositeDisposable)
@@ -59,9 +62,12 @@ class MainView @JvmOverloads constructor(
             endTimePickerDialog.updateTime(time.hour, time.minute)
             endTimePickerDialog.show()
         }
-        cancelStartTime.setOnClickListener { viewModel.startTime = null }
-        cancelEndTime.setOnClickListener { viewModel.endTime = null }
+        cancelStartTime.setOnClickListener { model.startTime = null }
+        cancelEndTime.setOnClickListener { model.endTime = null }
     }
 
+    override fun clearDisposable() {
+        compositeDisposable.clear()
+    }
 
 }

@@ -1,16 +1,8 @@
 package com.xi_zz.muteclock.template
 
-import io.reactivex.disposables.CompositeDisposable
+import android.os.Parcelable
 
-interface ModelView {
-    val compositeDisposable: CompositeDisposable
+interface ModelView<T : Parcelable, M : ViewModel<T>> {
+    fun bindViewModel(viewModel: M)
     fun clearDisposable()
-}
-
-class BaseModelView : ModelView {
-
-    override val compositeDisposable = CompositeDisposable()
-
-    override fun clearDisposable() =
-        compositeDisposable.clear()
 }
