@@ -15,7 +15,7 @@ data class State(
         var endTime: LocalTime? = null
 ) : Parcelable
 
-class MainViewModel @Inject constructor(val timeService: TimeService) : BaseViewModel<State>(State()) {
+class MainViewModel @Inject constructor(private val timeService: TimeService) : BaseViewModel<State>(State()) {
 
     init {
         timeService.observeStartTime().subscribe {
