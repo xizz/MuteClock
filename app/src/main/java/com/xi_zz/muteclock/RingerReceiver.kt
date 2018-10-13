@@ -1,11 +1,12 @@
 package com.xi_zz.muteclock
 
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
-import android.widget.Toast
 import com.xi_zz.muteclock.Util.EXTRA_MUTE
+import com.xi_zz.muteclock.Util.checkAndAskForNotificationPolicyAccess
 
 // adb shell am broadcast -n com.xi_zz.muteclock/.RingerReceiver --es extra_test "adb_testing"
 // adb shell am broadcast -n com.xi_zz.muteclock/.RingerReceiver --ez EXTRA_MUTE true
@@ -16,14 +17,14 @@ import com.xi_zz.muteclock.Util.EXTRA_MUTE
 class RingerReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
 
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val action = intent.getBooleanExtra(EXTRA_MUTE, false)
+        val mute = intent.getBooleanExtra(EXTRA_MUTE, false)
 
-        Toast.makeText(context, "Phone Muted: $action", Toast.LENGTH_LONG).show()
+//        Toast.makeText(context, "Phone Muted: $mute", Toast.LENGTH_LONG).show()
 
-        if (action)
-            audioManager.ringerMode = AudioManager.RINGER_MODE_SILENT
-        else
-            audioManager.ringerMode = AudioManager.RINGER_MODE_NORMAL
+        if (notificationManager.checkAndAskForNotificationPolicyAccess(context)) {
+            audioManager.ringerMode = if (mute) AudioManager.RINGER_MODE_SILENT else AudioManager.RINGER_MODE_NORMAL
+        }
     }
 }

@@ -6,4 +6,5 @@
     <string name="set_end_time">Set End Time</string>
     <string name="cancel_start_time">Cancel Start Time</string>
     <string name="cancel_end_time">Cancel End Time</string>
+    <string name="enable_permission">Please enable permission.</string>
 </resources>
