@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MuteClock</string>
+    <string name="no_start_time">No start time set</string>
+    <string name="no_end_time">No end time set</string>
+    <string name="set_start_time">Set Start Time</string>
+    <string name="set_end_time">Set End Time</string>
+    <string name="cancel_start_time">Cancel Start Time</string>
+    <string name="cancel_end_time">Cancel End Time</string>
 </resources>
