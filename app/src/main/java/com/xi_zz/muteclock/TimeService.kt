@@ -28,6 +28,7 @@ interface TimeService {
     fun observeEndTime(): Observable<Optional<LocalTime>>
     fun setStartTime(time: LocalTime?)
     fun setEndTime(time: LocalTime?)
+    fun resetAlarm()
 
     companion object {
         const val MUTE = 11
@@ -44,12 +45,7 @@ class TimeServiceImp @Inject constructor(application: Application) : TimeService
     private var endTimeSubject = BehaviorSubject.create<Optional<LocalTime>>()
 
     init {
-        val startNano = preferences.getLong(KEY_START_TIME, NULL_TIME)
-        val endNano = preferences.getLong(KEY_END_TIME, NULL_TIME)
-        if (startNano != NULL_TIME)
-            startTimeSubject.onNext(Optional.of(LocalTime.ofNanoOfDay(startNano)))
-        if (endNano != NULL_TIME)
-            endTimeSubject.onNext(Optional.of(LocalTime.ofNanoOfDay(endNano)))
+        resetAlarm()
     }
 
     override fun observeStartTime(): Observable<Optional<LocalTime>> = startTimeSubject
@@ -103,5 +99,14 @@ class TimeServiceImp @Inject constructor(application: Application) : TimeService
             PendingIntent.getBroadcast(appContext, requestCode, it, PendingIntent.FLAG_UPDATE_CURRENT)
         }
         alarmManager.cancel(pendingIntent)
+    }
+
+    override fun resetAlarm() {
+        val startNano = preferences.getLong(KEY_START_TIME, NULL_TIME)
+        val endNano = preferences.getLong(KEY_END_TIME, NULL_TIME)
+        if (startNano != NULL_TIME)
+            startTimeSubject.onNext(Optional.of(LocalTime.ofNanoOfDay(startNano)))
+        if (endNano != NULL_TIME)
+            endTimeSubject.onNext(Optional.of(LocalTime.ofNanoOfDay(endNano)))
     }
 }
