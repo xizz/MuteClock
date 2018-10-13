@@ -10,8 +10,8 @@ import com.xi_zz.muteclock.Util.subscribeFromUI
 import com.xi_zz.muteclock.template.ModelView
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import kotlinx.android.synthetic.main.main.view.cancelEndTime
-import kotlinx.android.synthetic.main.main.view.cancelStartTime
+import kotlinx.android.synthetic.main.main.view.cancelEndTimeButton
+import kotlinx.android.synthetic.main.main.view.cancelStartTimeButton
 import kotlinx.android.synthetic.main.main.view.endTimeText
 import kotlinx.android.synthetic.main.main.view.setEndTimeButton
 import kotlinx.android.synthetic.main.main.view.setStartTimeButton
@@ -62,8 +62,8 @@ class MainView @JvmOverloads constructor(
             endTimePickerDialog.updateTime(time.hour, time.minute)
             endTimePickerDialog.show()
         }
-        cancelStartTime.setOnClickListener { model.startTime = null }
-        cancelEndTime.setOnClickListener { model.endTime = null }
+        cancelStartTimeButton.setOnClickListener { model.startTime = null }
+        cancelEndTimeButton.setOnClickListener { model.endTime = null }
     }
 
     override fun clearDisposable() {

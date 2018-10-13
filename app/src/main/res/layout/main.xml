@@ -60,22 +60,22 @@
             />
 
         <Button
-            android:id="@+id/cancelStartTime"
+            android:id="@+id/cancelStartTimeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cancel_start_time"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/cancelEndTime"
+            app:layout_constraintRight_toLeftOf="@+id/cancelEndTimeButton"
             />
 
         <Button
-            android:id="@+id/cancelEndTime"
+            android:id="@+id/cancelEndTimeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cancel_end_time"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/cancelStartTime"
+            app:layout_constraintLeft_toRightOf="@+id/cancelStartTimeButton"
             app:layout_constraintRight_toRightOf="parent"
             />
     </android.support.constraint.ConstraintLayout>
