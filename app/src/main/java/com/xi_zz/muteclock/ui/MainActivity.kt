@@ -10,10 +10,30 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModel: MainViewModel
 
+    private val view: MainView by lazy { MainView(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
-        val view = MainView(this)
         setContentView(view)
+        view.viewModel = viewModel
+        view.setupView()
+        // TODO: refactor to one line
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        viewModel.saveState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        viewModel.loadState(savedInstanceState)
+        super.onRestoreInstanceState(savedInstanceState)
+    }
+
+    override fun onDestroy() {
+        viewModel.clearDisposable()
+        view.clearDisposable()
+        super.onDestroy()
     }
 }

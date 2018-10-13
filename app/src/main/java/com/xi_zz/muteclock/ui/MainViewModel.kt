@@ -19,11 +19,13 @@ class MainViewModel @Inject constructor(val timeService: TimeService) : BaseView
 
     init {
         timeService.observeStartTime().subscribe {
-            currentState.startTime = it.value
+            //            currentState.startTime = it.value
+            currentState = currentState.copy(startTime = it.value)
             mutateState(currentState)
         }.addTo(compositeDisposable)
         timeService.observeEndTime().subscribe {
-            currentState.endTime = it.value
+            //            currentState.endTime = it.value
+            currentState = currentState.copy(endTime = it.value)
             mutateState(currentState)
         }.addTo(compositeDisposable)
     }

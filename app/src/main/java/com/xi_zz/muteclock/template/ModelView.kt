@@ -1,10 +1,16 @@
 package com.xi_zz.muteclock.template
 
-import android.os.Bundle
 import io.reactivex.disposables.CompositeDisposable
 
 interface ModelView {
-    fun bind(disposable: CompositeDisposable)
-    fun saveInstanceState(outState: Bundle)
-    fun restoreInstanceState(savedInstanceState: Bundle)
+    val compositeDisposable: CompositeDisposable
+    fun clearDisposable()
+}
+
+class BaseModelView : ModelView {
+
+    override val compositeDisposable = CompositeDisposable()
+
+    override fun clearDisposable() =
+        compositeDisposable.clear()
 }
