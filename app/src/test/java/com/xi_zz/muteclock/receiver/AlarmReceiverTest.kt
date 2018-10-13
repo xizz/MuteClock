@@ -1,4 +1,4 @@
-package com.xi_zz.muteclock
+package com.xi_zz.muteclock.receiver
 
 import android.content.Context
 import android.content.Intent
@@ -15,31 +15,31 @@ import org.robolectric.annotation.Config
 
 @Config(sdk = [Build.VERSION_CODES.O])
 @RunWith(RobolectricTestRunner::class)
-class RingerReceiverTest {
+class AlarmReceiverTest {
 
     private val application = RuntimeEnvironment.application
-    private lateinit var ringerReceiver: RingerReceiver
+    private lateinit var alarmReceiver: AlarmReceiver
     private lateinit var audioManager: AudioManager
 
     @Before
     fun setUp() {
-        ringerReceiver = RingerReceiver()
+        alarmReceiver = AlarmReceiver()
         audioManager = application.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     }
 
     @Test
     fun testMuteAudioManager() {
         audioManager.ringerMode = AudioManager.RINGER_MODE_NORMAL
-        val intent = Intent(application, RingerReceiver::class.java).putExtra(EXTRA_MUTE, true)
-        ringerReceiver.onReceive(application, intent)
+        val intent = Intent(application, AlarmReceiver::class.java).putExtra(EXTRA_MUTE, true)
+        alarmReceiver.onReceive(application, intent)
         Assert.assertEquals(AudioManager.RINGER_MODE_SILENT, audioManager.ringerMode)
     }
 
     @Test
     fun testUnmuteAudioManager() {
         audioManager.ringerMode = AudioManager.RINGER_MODE_SILENT
-        val intent = Intent(application, RingerReceiver::class.java).putExtra(EXTRA_MUTE, false)
-        ringerReceiver.onReceive(application, intent)
+        val intent = Intent(application, AlarmReceiver::class.java).putExtra(EXTRA_MUTE, false)
+        alarmReceiver.onReceive(application, intent)
         Assert.assertEquals(AudioManager.RINGER_MODE_NORMAL, audioManager.ringerMode)
     }
 }

@@ -14,6 +14,7 @@ import com.xi_zz.muteclock.Util.NULL_TIME
 import com.xi_zz.muteclock.Util.PREF_TIME
 import com.xi_zz.muteclock.Util.calendar
 import com.xi_zz.muteclock.Util.checkAndAskForNotificationPolicyAccess
+import com.xi_zz.muteclock.receiver.AlarmReceiver
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
@@ -80,7 +81,7 @@ class TimeServiceImp @Inject constructor(application: Application) : TimeService
         subject.onNext(Optional.of(time))
 
         // Set the Alarm
-        val pendingIntent = Intent(appContext, RingerReceiver::class.java).let {
+        val pendingIntent = Intent(appContext, AlarmReceiver::class.java).let {
             it.putExtra(EXTRA_MUTE, mute)
             PendingIntent.getBroadcast(appContext, requestCode, it, PendingIntent.FLAG_UPDATE_CURRENT)
         }
@@ -97,7 +98,7 @@ class TimeServiceImp @Inject constructor(application: Application) : TimeService
         subject.onNext(Optional.empty())
 
         // Remove from Alarm
-        val pendingIntent = Intent(appContext, RingerReceiver::class.java).let {
+        val pendingIntent = Intent(appContext, AlarmReceiver::class.java).let {
             it.putExtra(EXTRA_MUTE, mute)
             PendingIntent.getBroadcast(appContext, requestCode, it, PendingIntent.FLAG_UPDATE_CURRENT)
         }
