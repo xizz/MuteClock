@@ -2,6 +2,7 @@ package com.xi_zz.muteclock
 
 import android.app.AlarmManager
 import android.app.Application
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
@@ -12,6 +13,7 @@ import com.xi_zz.muteclock.Util.KEY_START_TIME
 import com.xi_zz.muteclock.Util.NULL_TIME
 import com.xi_zz.muteclock.Util.PREF_TIME
 import com.xi_zz.muteclock.Util.calendar
+import com.xi_zz.muteclock.Util.checkAndAskForNotificationPolicyAccess
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
@@ -36,6 +38,7 @@ class TimeServiceImp @Inject constructor(application: Application) : TimeService
     private val appContext = application.applicationContext
     private val preferences = appContext.getSharedPreferences(PREF_TIME, Context.MODE_PRIVATE)
     private val alarmManager = appContext.getSystemService(ALARM_SERVICE) as AlarmManager
+    private val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private var startTimeSubject = BehaviorSubject.create<Optional<LocalTime>>()
     private var endTimeSubject = BehaviorSubject.create<Optional<LocalTime>>()
 
@@ -67,6 +70,9 @@ class TimeServiceImp @Inject constructor(application: Application) : TimeService
     }
 
     private fun setTime(key: String, time: LocalTime, subject: Subject<Optional<LocalTime>>, mute: Boolean, requestCode: Int) {
+        // Permission reminder
+        notificationManager.checkAndAskForNotificationPolicyAccess(appContext)
+
         // Save to Disk
         preferences.edit().putLong(key, time.toNanoOfDay()).apply()
 
@@ -79,7 +85,8 @@ class TimeServiceImp @Inject constructor(application: Application) : TimeService
             PendingIntent.getBroadcast(appContext, requestCode, it, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
-        alarmManager.setRepeating(AlarmManager.RTC, time.calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
+//        alarmManager.setRepeating(AlarmManager.RTC, time.calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
+        alarmManager.setExact(AlarmManager.RTC, time.calendar.timeInMillis, pendingIntent)
     }
 
     private fun cancelTime(key: String, subject: Subject<Optional<LocalTime>>, mute: Boolean, requestCode: Int) {

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
+import android.widget.Toast
 import com.xi_zz.muteclock.Util.EXTRA_MUTE
 import com.xi_zz.muteclock.Util.checkAndAskForNotificationPolicyAccess
 
@@ -21,9 +22,9 @@ class RingerReceiver : BroadcastReceiver() {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val mute = intent.getBooleanExtra(EXTRA_MUTE, false)
 
-//        Toast.makeText(context, "Phone Muted: $mute", Toast.LENGTH_LONG).show()
 
         if (notificationManager.checkAndAskForNotificationPolicyAccess(context)) {
+            Toast.makeText(context, "Phone Muted: $mute", Toast.LENGTH_LONG).show()
             audioManager.ringerMode = if (mute) AudioManager.RINGER_MODE_SILENT else AudioManager.RINGER_MODE_NORMAL
         }
     }
