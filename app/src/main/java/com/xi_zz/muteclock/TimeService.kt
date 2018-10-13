@@ -85,8 +85,8 @@ class TimeServiceImp @Inject constructor(application: Application) : TimeService
             PendingIntent.getBroadcast(appContext, requestCode, it, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
-//        alarmManager.setRepeating(AlarmManager.RTC, time.calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
-        alarmManager.setExact(AlarmManager.RTC, time.calendar.timeInMillis, pendingIntent)
+        alarmManager.setRepeating(AlarmManager.RTC, time.calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
+//        alarmManager.setExact(AlarmManager.RTC, time.calendar.timeInMillis, pendingIntent)
     }
 
     private fun cancelTime(key: String, subject: Subject<Optional<LocalTime>>, mute: Boolean, requestCode: Int) {
