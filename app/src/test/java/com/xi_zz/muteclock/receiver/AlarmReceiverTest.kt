@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.content.Intent
 import android.media.AudioManager
 import android.os.Build
+import com.xi_zz.muteclock.TestApplication
 import com.xi_zz.muteclock.Util.EXTRA_MUTE
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -17,7 +18,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
-@Config(sdk = [Build.VERSION_CODES.O])
+@Config(sdk = [Build.VERSION_CODES.O], application = TestApplication::class)
 @RunWith(RobolectricTestRunner::class)
 class AlarmReceiverTest {
 
