@@ -10,6 +10,8 @@ import android.widget.Toast
 import com.xi_zz.muteclock.Util.APP_TAG
 import com.xi_zz.muteclock.Util.EXTRA_MUTE
 import com.xi_zz.muteclock.Util.checkAndAskForNotificationPolicyAccess
+import dagger.android.AndroidInjection
+import javax.inject.Inject
 
 // adb shell am broadcast -n com.xi_zz.muteclock/com.xi_zz.muteclock.receiver.AlarmReceiver --es extra_test "adb_testing"
 // adb shell am broadcast -n com.xi_zz.muteclock/com.xi_zz.muteclock.receiver.AlarmReceiver -f 32 --ez EXTRA_MUTE true
@@ -20,9 +22,15 @@ import com.xi_zz.muteclock.Util.checkAndAskForNotificationPolicyAccess
 
 class AlarmReceiver : BroadcastReceiver() {
 
+    @Inject
+    lateinit var notificationManager: NotificationManager
+    @Inject
+    lateinit var audioManager: AudioManager
+
+
     override fun onReceive(context: Context, intent: Intent) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        AndroidInjection.inject(this, context)
+
         val mute = intent.getBooleanExtra(EXTRA_MUTE, false)
 
 

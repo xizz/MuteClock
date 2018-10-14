@@ -1,5 +1,6 @@
 package com.xi_zz.muteclock.injection
 
+import com.xi_zz.muteclock.receiver.AlarmReceiver
 import com.xi_zz.muteclock.receiver.BootReceiver
 import com.xi_zz.muteclock.ui.MainActivity
 import dagger.Module
@@ -12,4 +13,7 @@ abstract class AndroidModule {
 
     @ContributesAndroidInjector
     abstract fun bindBootReceiver(): BootReceiver
+
+    @ContributesAndroidInjector
+    abstract fun bindAlarmReceiveReceiver(): AlarmReceiver
 }
