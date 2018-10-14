@@ -53,12 +53,12 @@ class MainView @JvmOverloads constructor(
         }.addTo(compositeDisposable)
 
         setStartTimeButton.setOnClickListener {
-            val time = LocalTime.now()
+            val time = model.currentState.startTime ?: LocalTime.now()
             startTimePickerDialog.updateTime(time.hour, time.minute)
             startTimePickerDialog.show()
         }
         setEndTimeButton.setOnClickListener {
-            val time = LocalTime.now()
+            val time = model.currentState.endTime ?: LocalTime.now()
             endTimePickerDialog.updateTime(time.hour, time.minute)
             endTimePickerDialog.show()
         }

@@ -17,7 +17,7 @@ interface ViewModel<T : Parcelable> {
 abstract class BaseViewModel<T : Parcelable>(initState: T) : ViewModel<T> {
     private val subject = BehaviorSubject.create<T>().apply { onNext(initState) }
     protected val compositeDisposable = CompositeDisposable()
-    protected var currentState = initState
+    var currentState = initState
 
     override val state: Observable<T>
         get() = subject
