@@ -7,13 +7,13 @@ import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
 @Module
-abstract class AndroidModule {
+internal abstract class AndroidModule {
     @ContributesAndroidInjector
-    abstract fun bindMainActivity(): MainActivity
+    internal abstract fun bindMainActivity(): MainActivity
 
     @ContributesAndroidInjector
-    abstract fun bindBootReceiver(): BootReceiver
+    internal abstract fun bindBootReceiver(): BootReceiver
 
     @ContributesAndroidInjector
-    abstract fun bindAlarmReceiveReceiver(): AlarmReceiver
+    internal abstract fun bindAlarmReceiveReceiver(): AlarmReceiver
 }

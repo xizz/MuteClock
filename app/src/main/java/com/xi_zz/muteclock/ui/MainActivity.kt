@@ -8,7 +8,7 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var viewModel: MainViewModel
+    internal lateinit var viewModel: MainViewModel
 
     private val view: MainView by lazy { MainView(this) }
 

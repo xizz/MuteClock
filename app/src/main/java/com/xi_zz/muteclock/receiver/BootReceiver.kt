@@ -18,7 +18,7 @@ import javax.inject.Inject
 class BootReceiver : BroadcastReceiver() {
 
     @Inject
-    lateinit var timeService: TimeService
+    internal lateinit var timeService: TimeService
 
     override fun onReceive(context: Context, intent: Intent) {
         AndroidInjection.inject(this, context)
