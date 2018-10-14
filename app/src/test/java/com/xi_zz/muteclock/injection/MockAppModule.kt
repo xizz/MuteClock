@@ -14,7 +14,7 @@ import io.mockk.slot
 internal class MockAppModule {
     @Provides
     internal fun provideTimePreferences(): SharedPreferences {
-        val preferences: SharedPreferences = mockk()
+        val preferences: SharedPreferences = mockk(relaxed = true)
         val slot = slot<Long>()
         every { preferences.getLong(any(), capture(slot)) } answers { slot.captured }
         return preferences
@@ -22,18 +22,17 @@ internal class MockAppModule {
 
     @Provides
     internal fun provideAlarmManager(): AlarmManager =
-        mockk()
+        mockk(relaxed = true)
 
     @Provides
     internal fun provideAudioManager(): AudioManager =
-        mockk()
+        mockk(relaxed = true)
 
     @Provides
     internal fun provideNotificationManager(): NotificationManager {
-        val notificationManager: NotificationManager = mockk()
+        val notificationManager: NotificationManager = mockk(relaxed = true)
         every { notificationManager.isNotificationPolicyAccessGranted } returns true
         return notificationManager
     }
-
 
 }

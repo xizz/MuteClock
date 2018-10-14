@@ -27,12 +27,10 @@ class AlarmReceiver : BroadcastReceiver() {
     @Inject
     lateinit var audioManager: AudioManager
 
-
     override fun onReceive(context: Context, intent: Intent) {
         AndroidInjection.inject(this, context)
 
         val mute = intent.getBooleanExtra(EXTRA_MUTE, false)
-
 
         if (notificationManager.checkAndAskForNotificationPolicyAccess(context)) {
             Toast.makeText(context, "Phone Muted: $mute", Toast.LENGTH_LONG).show()
