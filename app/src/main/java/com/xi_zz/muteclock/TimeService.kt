@@ -105,8 +105,12 @@ class TimeServiceImp @Inject constructor(application: Application) : TimeService
         val startNano = preferences.getLong(KEY_START_TIME, NULL_TIME)
         val endNano = preferences.getLong(KEY_END_TIME, NULL_TIME)
         if (startNano != NULL_TIME)
-            startTimeSubject.onNext(Optional.of(LocalTime.ofNanoOfDay(startNano)))
+            setTime(KEY_START_TIME, LocalTime.ofNanoOfDay(startNano), startTimeSubject, true, TimeService.MUTE)
+        else
+            cancelTime(KEY_START_TIME, startTimeSubject, true, TimeService.MUTE)
         if (endNano != NULL_TIME)
-            endTimeSubject.onNext(Optional.of(LocalTime.ofNanoOfDay(endNano)))
+            setTime(KEY_END_TIME, LocalTime.ofNanoOfDay(endNano), endTimeSubject, false, TimeService.UNMUTE)
+        else
+            cancelTime(KEY_END_TIME, endTimeSubject, true, TimeService.MUTE)
     }
 }

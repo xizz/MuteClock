@@ -1,5 +1,6 @@
 package com.xi_zz.muteclock.injection
 
+import com.xi_zz.muteclock.receiver.BootReceiver
 import com.xi_zz.muteclock.ui.MainActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -8,4 +9,7 @@ import dagger.android.ContributesAndroidInjector
 abstract class ActivityBuilder {
     @ContributesAndroidInjector
     abstract fun bindMainActivity(): MainActivity
+
+    @ContributesAndroidInjector
+    abstract fun bindBootReceiver(): BootReceiver
 }

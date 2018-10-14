@@ -5,7 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
+import android.util.Log
 import android.widget.Toast
+import com.xi_zz.muteclock.Util.APP_TAG
 import com.xi_zz.muteclock.Util.EXTRA_MUTE
 import com.xi_zz.muteclock.Util.checkAndAskForNotificationPolicyAccess
 
@@ -26,6 +28,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         if (notificationManager.checkAndAskForNotificationPolicyAccess(context)) {
             Toast.makeText(context, "Phone Muted: $mute", Toast.LENGTH_LONG).show()
+            Log.i(APP_TAG, "Phone Muted: $mute")
             audioManager.ringerMode = if (mute) AudioManager.RINGER_MODE_SILENT else AudioManager.RINGER_MODE_NORMAL
         }
     }
