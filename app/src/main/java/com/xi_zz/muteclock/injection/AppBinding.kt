@@ -1,7 +1,7 @@
 package com.xi_zz.muteclock.injection
 
-import com.xi_zz.muteclock.TimeService
-import com.xi_zz.muteclock.TimeServiceImp
+import com.xi_zz.muteclock.service.TimeService
+import com.xi_zz.muteclock.service.TimeServiceImp
 import dagger.Binds
 import dagger.Module
 

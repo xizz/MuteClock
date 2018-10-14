@@ -1,7 +1,7 @@
 package com.xi_zz.muteclock.ui
 
-import com.xi_zz.muteclock.TimeService
 import com.xi_zz.muteclock.Util.unwrapMap
+import com.xi_zz.muteclock.service.TimeService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot

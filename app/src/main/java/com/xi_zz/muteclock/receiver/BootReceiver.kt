@@ -4,8 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.xi_zz.muteclock.TimeService
 import com.xi_zz.muteclock.Util.APP_TAG
+import com.xi_zz.muteclock.service.TimeService
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 

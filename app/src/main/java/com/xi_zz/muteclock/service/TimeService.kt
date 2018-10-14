@@ -1,4 +1,4 @@
-package com.xi_zz.muteclock
+package com.xi_zz.muteclock.service
 
 import android.app.AlarmManager
 import android.app.Application
