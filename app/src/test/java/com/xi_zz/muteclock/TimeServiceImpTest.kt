@@ -1,26 +1,30 @@
 package com.xi_zz.muteclock
 
 import android.app.AlarmManager
-import android.content.Context
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import com.xi_zz.muteclock.Util.KEY_END_TIME
 import com.xi_zz.muteclock.Util.KEY_START_TIME
 import com.xi_zz.muteclock.Util.NULL_TIME
-import com.xi_zz.muteclock.Util.PREF_TIME
 import com.xi_zz.muteclock.Util.calendar
-import com.xi_zz.muteclock.Util.localTime
+import com.xi_zz.muteclock.Util.checkAndAskForNotificationPolicyAccess
+import com.xi_zz.muteclock.receiver.AlarmReceiver
 import com.xi_zz.muteclock.service.TimeService
 import com.xi_zz.muteclock.service.TimeServiceImp
-import org.junit.Assert
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.slot
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
-import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowAlarmManager
 import java.time.LocalTime
 import java.util.Optional
 
@@ -28,57 +32,82 @@ import java.util.Optional
 @RunWith(RobolectricTestRunner::class)
 class TimeServiceImpTest {
 
-    private lateinit var timerService: TimeService
+    private lateinit var timerService: TimeServiceImp
 
     private val application = RuntimeEnvironment.application
-    private var preferences: SharedPreferences = application.getSharedPreferences(PREF_TIME, Context.MODE_PRIVATE)
-    private var shadowAlarmManager: ShadowAlarmManager = shadowOf(application.getSystemService(Context.ALARM_SERVICE) as AlarmManager)
 
+    @MockK
+    private lateinit var preferences: SharedPreferences
+
+    @MockK
+    private lateinit var alarmManager: AlarmManager
+
+    @MockK
+    private lateinit var notificationManager: NotificationManager
 
     @Before
     fun setUp() {
-        timerService = TimeServiceImp(application)
+        MockKAnnotations.init(this, relaxed = true)
+        val slot = slot<Long>()
+        every { preferences.getLong(any(), capture(slot)) } answers { slot.captured }
+        every { notificationManager.isNotificationPolicyAccessGranted } returns true
+        timerService = TimeServiceImp(application, preferences, alarmManager, notificationManager)
     }
 
     @Test
     fun testSetStartTime() {
-        val startTime = LocalTime.of(5, 30)
-        timerService.setStartTime(startTime)
+        val time = LocalTime.of(5, 30)
+        timerService.setStartTime(time)
 
-        Assert.assertEquals(startTime, shadowAlarmManager.nextScheduledAlarm.triggerAtTime.calendar.localTime)
-        Assert.assertEquals(startTime.toNanoOfDay(), preferences.getLong(KEY_START_TIME, 0))
+        verify { notificationManager.checkAndAskForNotificationPolicyAccess(application) }
+
+        verify { preferences.edit().putLong(KEY_START_TIME, time.toNanoOfDay()).apply() }
+
+        val pendingIntent = Intent(application, AlarmReceiver::class.java).let {
+            PendingIntent.getBroadcast(application, TimeService.MUTE, it, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+        verify { alarmManager.setRepeating(AlarmManager.RTC, time.calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent) }
+
         timerService.observeStartTime().test()
-                .assertNoErrors()
-                .assertValue(Optional.of(startTime))
+            .assertNoErrors()
+            .assertValue(Optional.of(time))
     }
 
     @Test
     fun testSetEndTime() {
-        val endTime = LocalTime.of(15, 45)
-        timerService.setEndTime(endTime)
+        val time = LocalTime.of(15, 45)
+        timerService.setEndTime(time)
 
-        Assert.assertEquals(endTime, shadowAlarmManager.nextScheduledAlarm.triggerAtTime.calendar.localTime)
-        Assert.assertEquals(endTime.toNanoOfDay(), preferences.getLong(KEY_END_TIME, 0))
+        verify { notificationManager.checkAndAskForNotificationPolicyAccess(application) }
+
+        verify { preferences.edit().putLong(KEY_END_TIME, time.toNanoOfDay()).apply() }
+
+        val pendingIntent = Intent(application, AlarmReceiver::class.java).let {
+            PendingIntent.getBroadcast(application, TimeService.UNMUTE, it, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+        verify { alarmManager.setRepeating(AlarmManager.RTC, time.calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent) }
+
         timerService.observeEndTime().test()
-                .assertNoErrors()
-                .assertValue(Optional.of(endTime))
+            .assertNoErrors()
+            .assertValue(Optional.of(time))
     }
 
     @Test
     fun testNoObservableEventIfTimeNotSaved() {
-        timerService = TimeServiceImp(application)
-
-        timerService.observeStartTime().test().assertEmpty()
-        timerService.observeEndTime().test().assertEmpty()
+        timerService.resetAlarm()
+        timerService.observeStartTime().test().assertValue(Optional.empty())
+        timerService.observeEndTime().test().assertValue(Optional.empty())
     }
 
     @Test
     fun testHasObservableEventIfTimeSaved() {
         val startNano = 5000L
         val endNano = 15000L
-        preferences.edit().putLong(KEY_START_TIME, startNano).commit()
-        preferences.edit().putLong(KEY_END_TIME, endNano).commit()
-        timerService = TimeServiceImp(application)
+
+        every { preferences.getLong(KEY_START_TIME, NULL_TIME) } returns startNano
+        every { preferences.getLong(KEY_END_TIME, NULL_TIME) } returns endNano
+
+        timerService.resetAlarm()
 
         timerService.observeStartTime().test().assertValue(Optional.of(LocalTime.ofNanoOfDay(startNano)))
         timerService.observeEndTime().test().assertValue(Optional.of(LocalTime.ofNanoOfDay(endNano)))
@@ -86,21 +115,27 @@ class TimeServiceImpTest {
 
     @Test
     fun testCancelStartTime() {
-        preferences.edit().putLong(KEY_START_TIME, 5000).commit()
-        timerService.setStartTime(null)
+        verify { preferences.edit().remove(KEY_START_TIME).apply() }
 
-        Assert.assertEquals(NULL_TIME, preferences.getLong(KEY_START_TIME, NULL_TIME))
-        Assert.assertEquals(null, shadowAlarmManager.nextScheduledAlarm)
+        val pendingIntent = Intent(application, AlarmReceiver::class.java).let {
+            PendingIntent.getBroadcast(application, TimeService.MUTE, it, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+        verify { alarmManager.cancel(pendingIntent) }
+
         timerService.observeStartTime().test().assertValue(Optional.empty())
     }
 
     @Test
     fun testCancelEndTime() {
-        preferences.edit().putLong(KEY_END_TIME, 5000).commit()
         timerService.setEndTime(null)
 
-        Assert.assertEquals(NULL_TIME, preferences.getLong(KEY_END_TIME, NULL_TIME))
-        Assert.assertEquals(null, shadowAlarmManager.nextScheduledAlarm)
+        verify { preferences.edit().remove(KEY_END_TIME).apply() }
+
+        val pendingIntent = Intent(application, AlarmReceiver::class.java).let {
+            PendingIntent.getBroadcast(application, TimeService.UNMUTE, it, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+        verify { alarmManager.cancel(pendingIntent) }
+
         timerService.observeEndTime().test().assertValue(Optional.empty())
     }
 

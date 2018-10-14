@@ -8,6 +8,7 @@ val LocalTime.calendar: Calendar
     get() = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, hour)
         set(Calendar.MINUTE, minute)
+        set(Calendar.MILLISECOND, nano * 1000)
     }
 
 val Long.calendar: Calendar get() = Calendar.getInstance().apply { timeInMillis = this@calendar }

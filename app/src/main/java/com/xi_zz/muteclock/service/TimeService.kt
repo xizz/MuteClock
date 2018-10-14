@@ -4,13 +4,12 @@ import android.app.AlarmManager
 import android.app.Application
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import com.xi_zz.muteclock.Util.EXTRA_MUTE
 import com.xi_zz.muteclock.Util.KEY_END_TIME
 import com.xi_zz.muteclock.Util.KEY_START_TIME
 import com.xi_zz.muteclock.Util.NULL_TIME
-import com.xi_zz.muteclock.Util.PREF_TIME
 import com.xi_zz.muteclock.Util.calendar
 import com.xi_zz.muteclock.Util.checkAndAskForNotificationPolicyAccess
 import com.xi_zz.muteclock.receiver.AlarmReceiver
@@ -37,10 +36,10 @@ interface TimeService {
 
 class TimeServiceImp @Inject constructor(
     private val application: Application,
+    private val preferences: SharedPreferences,
     private val alarmManager: AlarmManager,
     private val notificationManager: NotificationManager
 ) : TimeService {
-    private val preferences = application.getSharedPreferences(PREF_TIME, Context.MODE_PRIVATE)
     private var startTimeSubject = BehaviorSubject.create<Optional<LocalTime>>()
     private var endTimeSubject = BehaviorSubject.create<Optional<LocalTime>>()
 
@@ -111,6 +110,6 @@ class TimeServiceImp @Inject constructor(
         if (endNano != NULL_TIME)
             setTime(KEY_END_TIME, LocalTime.ofNanoOfDay(endNano), endTimeSubject, false, TimeService.UNMUTE)
         else
-            cancelTime(KEY_END_TIME, endTimeSubject, true, TimeService.MUTE)
+            cancelTime(KEY_END_TIME, endTimeSubject, false, TimeService.UNMUTE)
     }
 }
